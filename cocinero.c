@@ -12,7 +12,7 @@
 
 struct mymsgbuf{ 
    long mtype; 
-   char mtext[MAX_SEND_SIZE];
+   char mtext[MAX_COLA];
 };
 
 int inicializar(){
@@ -32,7 +32,10 @@ int main(int argc, char** argv){
     printf("No se ha podido acceder a la cola correctamente\n");
   }
   for(i=1;i<=M_TYPES;i++){
-   msgrcv(msgcola_id,&qbuffer,MAX_COLA,i,IPC_NOWAIT);
+   msgrcv(msgcola_id,&qbuffer,MAX_COLA,i,0);
+   printf("Haciendo el producto %s\n",qbuffer-> mtext);
+   msgsend(msgcola_id,
+   sleep(5);
   }  
 
 
