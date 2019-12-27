@@ -8,6 +8,7 @@
 
 #define ERR_ABR 1
 #define MAX_COLA 100
+#define M_TYPES 5
 
 struct mymsgbuf{ 
    long mtype; 
@@ -30,8 +31,9 @@ int main(int argc, char** argv){
   if((error=inicializar())!=0){
     printf("No se ha podido acceder a la cola correctamente\n");
   }
-  msgrcv(msgcola_id,&qbuffer,MAX_COLA,1,IPC_NOWAIT);
-  msgrcv(msgcola_id,&qbuffer,MAX_COLA,2,IPC_NOWAIT);  
+  for(i=1;i<=M_TYPES;i++){
+   msgrcv(msgcola_id,&qbuffer,MAX_COLA,i,IPC_NOWAIT);
+  }  
 
 
 
