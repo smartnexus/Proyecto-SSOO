@@ -1,9 +1,15 @@
-#include "<stdio.h>"
-#include "<semaphore.h>"
-#include "<fcntl.h>"
-#include "<stdlib.h>"
-#include "<unistd.h>"
-
+#include <sys/wait.h> 
+#include <stdio.h> 
+#include <unistd.h>
+#include <stdlib.h> 
+#include <ctype.h> 
+#include <sys/msg.h> 
+#include <string.h>
+#include <semaphore.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/msg.h>
+#include <sys/shm.h>
 key_t clave;
 sem_t *llamar=NULL;
 int msgqueue_id;
