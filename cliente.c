@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <sys/msg.h>
 #include <sys/shm.h>
+#include <assert.h>
 
 #define MAX_COLA 80
 #define PEDIR 1
@@ -24,6 +25,20 @@ key_t clave;
 sem_t *llamar=NULL;
 int msgqueue_id;
 struct mymsgbuf qbuffer;
+
+void convertToArray(char * arr[], char list[], int size) {
+   char *item = strtok(list, ",");
+   char **ptr = arr;
+
+   int i = 0;
+   while(item != NULL) {
+      ptr[i] = item;
+      item = strtok(NULL, ",");
+      i++;
+   }
+   for (i = 0; i < size; i++)
+      printf("String %d : %s\n", i+1, ptr[i]);
+}
 
 void inicializar() {
    //Abrir semaforo
@@ -48,12 +63,6 @@ int main() {
       }
    }
    fgetc(stdin);   
-		
-   //TODO: Hacer bucle para que no se salga del programa cuando se pulsa la tecla incorrecta.
-   //Idea: Podemos poner que el menu sea numerado(es decir pulso el numero de lo que quiero) y que pulsando el 0 se acabe de pedir porque el bucle asi es while(0)
-   //Menu Ejemplo de lo anterior
-   //1.CocaCola
-   //0.Salir
    printf("Pulse ENTER para llamar al camarero.");
    char ch=fgetc(stdin);
    if(ch==0x0A) {
@@ -66,7 +75,56 @@ int main() {
       strncpy(qbuffer.mtext, mesa, MAX_COLA);
       msgsnd(msgqueue_id, &qbuffer, MAX_COLA, 0); 
       msgrcv(msgqueue_id, &qbuffer, MAX_COLA, SERVIR, 0);
-      printf("Texto: %s \n", qbuffer.mtext);
+      char bebidas[] = qbuffer.mtext;
+      msgrcv(msgqueue_id, &qbuffer, MAX_COLA, SERVIR, 0);
+      char comidas[] = qbuffer.mtext;
+      msgrcv(msgqueue_id, &qbuffer, MAX_COLA, SERVIR, 0);
+      char postres[] = qbuffer.mtext;
+      
+      char *lista_bebidas[10];
+      convertToArray(lista_bebidas, bebidas, 10); 
+      char *lista_comidas[10];
+      convertToArray(lista_comidas, comidas, 10); 
+      char *lista_postres[10];
+      convertToArray(lista_postres, postres, 10);
+
+
+      //TODO: Recibir menú y mostrar para selección.
+      
+      printf("=-=-=-=-=-=-=-=-=-=-=\nEl menú de hoy es:\n");
+      printf("1. Bebida\n2. Entrante\n3. Plato\n=-=-=-=-=-=-=-=-=-=-=\n");
+      printf("Para pedir vaya presionando introduciendo el número del producto y un 0 cuando haya terminado la comanda.\n");
+      int producto = -1;
+      while(producto != 0) {
+         printf("Introduzca un número: ");
+         scanf("%d", &producto);
+         switch(producto) {
+            case 1:
+               printf("Producto seleccionado: 1x BEBIDA\n");
+               qbuffer.mtype=PEDIR;
+               strncpy(qbuffer.mtext, "BEBIDA", MAX_COLA);
+               msgsnd(msgqueue_id, &qbuffer, MAX_COLA, 0);
+               break; 
+            case 2:
+               printf("Producto seleccionado: 1x COMIDA\n");
+               qbuffer.mtype=PEDIR;
+               strncpy(qbuffer.mtext, "COMIDA", MAX_COLA);
+               msgsnd(msgqueue_id, &qbuffer, MAX_COLA, 0);
+               break;
+            case 3:
+               printf("Producto seleccionado: 1x POSTRE\n");
+               qbuffer.mtype=PEDIR;
+               strncpy(qbuffer.mtext, "POSTRE", MAX_COLA);
+               msgsnd(msgqueue_id, &qbuffer, MAX_COLA, 0);
+               break;
+            case 0:
+               printf("Finalizando servicio.\n");
+               qbuffer.mtype=PEDIR;
+               strncpy(qbuffer.mtext, "FIN", MAX_COLA);
+               msgsnd(msgqueue_id, &qbuffer, MAX_COLA, 0);
+               break;
+         }
+      }
    } else {
       printf("La entrada introducida es incorrecta.\n");
    }
