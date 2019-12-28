@@ -44,10 +44,10 @@ int main() {
    inicializar();
    //TODO: Hacer bucle esperando mensaje de pedir de un cliente.
    while(1){////
-     //Recibir
-     printf("Esperando ");
+    //Recibir
+     printf("Esperando la llamada de algun cliente\n");
      msg_rcv = msgrcv(qid,&rbuffer,MAX_COLA,PEDIR,0);
-     printf("Nuevo cliente %s", rbuffer.mtext);
+     printf("Nuevo cliente en la mesa %s\n", rbuffer.mtext);
      
 
 
