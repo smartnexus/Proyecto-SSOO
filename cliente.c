@@ -11,6 +11,13 @@
 #include <sys/msg.h>
 #include <sys/shm.h>
 
+#define MAX_COLA 80
+
+struct mymsgbuf{
+   long mtype;
+   char mtext[MAX_COLA];
+};
+
 key_t clave;
 sem_t *llamar=NULL;
 int msgqueue_id;
@@ -38,13 +45,11 @@ int main() {
    if(ch==0x0A) {
       printf("Se ha llamado al camarero, espere por favor.\n");
       sem_wait(llamar);
-      //TODO: Enviar mensaje de pedir por cola y recibir menú.
-      tipo=1;//El tipo habria que incrementarlo de alguna manera dentro del bucle para cada cliente ser uno diferente
-      qbuffer.mtype=tipo;
-      strncpy(qbuffer.mtext,"pedir",MAX_COLA);//Aqui se tiene que pasar el menu al cliente?
-      msgsnd(msgqueue_id,&qbuffer,MAX_COLA,0); //No se va a quedar bloqueado aqui(nunca debe estar llena la cola aqui)
-      
-      msgrcv(msgqueue_id,&qbuffer,MAX_COLA,tipo,0);
+      //TODO: Enviar mensaje de pedir por cola y recibir menú. Cómo solo hay una cola entre camarero y mesas el tipo es 1.
+      qbuffer.mtype=1;
+      strncpy(qbuffer.mtext,"pedir:1",MAX_COLA);
+      msgsnd(msgqueue_id,&qbuffer,MAX_COLA,0); 
+      //msgrcv(msgqueue_id,&qbuffer,MAX_COLA,tipo,0);
    } else {
       printf("La entrada introducida es incorrecta.\n");
    }
