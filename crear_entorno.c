@@ -13,10 +13,10 @@
 
 #define TAM_SEG 1   ////////////////////////////////////////////////////////
 int main(){
-    key_t key; 
+  key_t key; 
   int msgqueue_id;
-    sem_t *semID=NULL;
-     int shmid;
+  sem_t *semID=NULL;
+  int shmid;
   char *addr=NULL;
 
     

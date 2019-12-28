@@ -48,6 +48,9 @@ int main(){
     printf("¿Que desea tomar?\nComencemos con la bebida: ");
     while (pedido!=0){
       pedido=solicitar(*bebidas);
+      //Comprobar disponibilidad (memoria compartida con cocina)
+
+      
       //Añadir pedido a la cola tipo numero de la mesa
       if (pedido!=0)
       add_cola(msgId, num_mesa, pedido);      
@@ -55,6 +58,9 @@ int main(){
     printf("Vamos a por los entrantes\n");
     while (pedido!=0){
       pedido=solicitar(*entrantes);
+      //Comprobar disponibilidad (memoria compartida con cocina)
+      
+      
       //Añadir pedido a la cola tipo numero de la mesa
       if (pedido!=0)
       add_cola(msgId, num_mesa, pedido);      
@@ -62,7 +68,9 @@ int main(){
     printf("Para finalizar, ¿desean algun plato?\n");
     while (pedido!=0){
       pedido=solicitar(*platos);
-      //Añadir pedido a la cola tipo numero de la mesa
+      //Comprobar disponibilidad (memoria compartida con cocina)
+      
+      //Añadir pedido a la cola tipo numero de la mesa    
       if (pedido!=0)
       add_cola(msgId, num_mesa, pedido);      
     }  
@@ -98,18 +106,15 @@ int crear_cola (){
       return msgId; 
     }
 }
-
-
-
  
 
-int add_cola(int qid,int num_mesa, int pedido) 
+int add_cola(int qid,int num_mesa,int pedido) 
 { 
   int resultado;
   struct mymsgbuf *qbuf;
 
   qbuf->mtype=num_mesa;
-  qbuf->mtext=pedido;
+  qbuf->mtext=(char *)pedido;
  
    
   resultado=msgsnd(qid,qbuf,MAX_COLA_TEXT,0);
