@@ -19,7 +19,6 @@ key_t clave;
 sem_t *llamar=NULL;
 int qid;
 struct mymsgbuf qbuffer;
-struct mymsgbuf rbuffer;
 
 
 
@@ -45,18 +44,13 @@ int main() {
    //TODO: Hacer bucle esperando mensaje de pedir de un cliente.
    while(1){////
     //Recibir
-     printf("Esperando la llamada de algun cliente\n");
-     msg_rcv = msgrcv(qid,&rbuffer,MAX_COLA,PEDIR,0);
-     printf("Nuevo cliente en la mesa %s\n", rbuffer.mtext);
-     
-
-
-
-
-
-     // msg_send = msgsnd(qid,qbuf,MAX_SEND_SIZE,0);
-
-
+     printf("Esperando la llamada de algun cliente.\n");
+     msgrcv(qid, &qbuffer, MAX_COLA, PEDIR, 0);
+     printf("Nuevo cliente en la mesa %s\n", qbuffer.mtext);
+     qbuffer.mtype=SERVIR;
+     printf("Enviando carta a cliente en la mesa %s\n", qbuffer.mtext);
+     strncpy(qbuffer.mtext,"carta:asdasdadadsadasdasdad,asdadsads,asdads,asdadad,asd.",MAX_COLA);
+     msgsnd(qid, &qbuffer, MAX_COLA, 0); 
 
    }
 }

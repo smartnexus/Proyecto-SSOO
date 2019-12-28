@@ -24,9 +24,8 @@ key_t clave;
 sem_t *llamar=NULL;
 int msgqueue_id;
 struct mymsgbuf qbuffer;
-struct mymsgbuf rbuffer;
 
-int inicializar() {
+void inicializar() {
    //Abrir semaforo
    llamar = sem_open("llamar_camarero", 0);
    clave=ftok(".",'m');
@@ -36,25 +35,38 @@ int inicializar() {
 }
 
 int main() {
+   int num_mesa=0;
+   int error=1;
    inicializar();
-   printf("¡Bienvenido!\n");
+   while (error==1){
+      printf("¡Bienvenido!, por favor indique el ńumero de mesa: ");
+      scanf("%d", &num_mesa);
+      if(num_mesa > 0) {
+         error=0;
+      } else {
+         printf("Número erróneo.\n");
+      }
+   }
+   fgetc(stdin);   
+		
    //TODO: Hacer bucle para que no se salga del programa cuando se pulsa la tecla incorrecta.
    //Idea: Podemos poner que el menu sea numerado(es decir pulso el numero de lo que quiero) y que pulsando el 0 se acabe de pedir porque el bucle asi es while(0)
    //Menu Ejemplo de lo anterior
    //1.CocaCola
    //0.Salir
-   printf("Pulse Enter para llamar al camarero:");
+   printf("Pulse ENTER para llamar al camarero.");
    char ch=fgetc(stdin);
    if(ch==0x0A) {
       printf("Se ha llamado al camarero, espere por favor.\n");
       sem_wait(llamar);
       //TODO: Enviar mensaje de pedir por cola y recibir menú. Cómo solo hay una cola entre camarero y mesas el tipo es 1 para pedir y 2 para servir.
       qbuffer.mtype=PEDIR;
-      strncpy(qbuffer.mtext,"pedir:1",MAX_COLA);
+      char mesa[10];
+      sprintf(mesa, "%d", num_mesa); 
+      strncpy(qbuffer.mtext, mesa, MAX_COLA);
       msgsnd(msgqueue_id, &qbuffer, MAX_COLA, 0); 
-      //TODO: Cliente envia texto pedir, queda esperar respuesta del camarero.
-      //msgrcv(msgqueue_id, &rbuffer, MAX_COLA, PEDIR, 0);
-      //printf("Tipo: %ld Texto:%s \n",qbuffer.mtype,qbuffer.mtext);
+      msgrcv(msgqueue_id, &qbuffer, MAX_COLA, SERVIR, 0);
+      printf("Texto: %s \n", qbuffer.mtext);
    } else {
       printf("La entrada introducida es incorrecta.\n");
    }
