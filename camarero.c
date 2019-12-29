@@ -15,8 +15,8 @@
 #define PEDIR 1
 #define SERVIR 2
 #define BEBIDAS 3
-#define ENTRANTES 4
-#define PLATOS 5
+#define COMIDAS 4
+#define POSTRES 5
 
 key_t clave;
 sem_t *llamar=NULL;
@@ -34,8 +34,8 @@ void inicializar();
 int main() {
   int fin=-1;
   char *bebidas = "Nada,Cerveza,Coca-Cola,Zumo,Nestea,Aquarius,Agua,Vino";
-  char *entrantes = "Nada,Ensaladilla,Papas Bravas,Ensalada,Tortilla,Puntillitas,Calamares,Revuelto de setas";
-  char *platos = "Nada,Paella,Solomillo,Entrecot,Bacalao,Arroz con pollo, esparragos, comida";
+  char *comidas = "Nada,Ensaladilla,Papas Bravas,Ensalada,Tortilla,Puntillitas,Calamares,Revuelto de setas";
+  char *postres = "Nada,Flan de huevo,Arroz con leche,Tarta de la abuela,Brownie,Tarta de turron,Helado, Fruta del dia";
   char *pista = "";
   inicializar();
   //TODO: Hacer bucle esperando mensaje de pedir de un cliente.
@@ -43,11 +43,9 @@ int main() {
     //Recibir
     printf("Esperando la llamada de algun cliente.\n");
     msgrcv(qid, &qbuffer, MAX_COLA, PEDIR, 0);
-    printf("Nuevo cliente en la mesa %s\n", qbuffer.mtext);
-     
+    printf("Nuevo cliente en la mesa %s\n", qbuffer.mtext);     
     qbuffer.mtype=SERVIR;
     printf("Enviando la carta al cliente en la mesa  %s\n", qbuffer.mtext);
-    //////////////////////////////////////////////bien
     //TODO: enviar BEBIDA COMIDA POSTRE
 
     while (strcmp(pista,"FIN") != 0){           
@@ -60,11 +58,11 @@ int main() {
       }
       if( strcmp(pista,"COMIDA") == 0){
 	printf("Enviando comidas.\n");
-	enviar_anotar(entrantes, ENTRANTES);
+	enviar_anotar(comidas, COMIDAS);
       }
       if( strcmp(pista,"POSTRE") == 0){
 	printf("Enviando postres.\n");
-	enviar_anotar(platos, PLATOS);
+	enviar_anotar(postres, POSTRES);
       }
       if(strcmp(pista,"FIN") == 0){
 	printf("El cliente no desea nada mas.\n");
@@ -91,7 +89,7 @@ void enviar_anotar(char *lista, int tipo){
   strncpy(qbuffer.mtext,lista,MAX_COLA);
   qbuffer.mtype=SERVIR;
   msgsnd(qid, &qbuffer, MAX_COLA, 0);
-  printf("Esperando a que los clientes decinan lo que desean tomar.\n");
+  printf("Esperando a que los clientes decidan lo que desean tomar.\n");
   //Recibir pedidos
   while(pedido!=0){
     msgrcv(qid, &qbuffer, MAX_COLA, PEDIR, 0);
