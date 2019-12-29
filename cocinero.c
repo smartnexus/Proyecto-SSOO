@@ -8,45 +8,41 @@
 
 #define ERR_ABR 1
 #define ERR_LEER 2
-#define MAX_COLA 100
-#define M_TYPES 5  //Numero de mesas maximas
+#define MAX_COLA 200
+#define BEBIDAS_PREPARAR 3  //Numero de cosas diferentes a servir de mas prioritarias a menos(bebidas,comidas y postres)
+#define COMIDAS_PREPARAR 4
+#define POSTRES_PREPARAR 5
+#define BEBIDAS_SERVIR 6
+#define COMIDAS_SERVIR 7
+#define POSTRES_SERVIR 8
 
 struct mymsgbuf{ 
    long mtype; 
    char mtext[MAX_COLA];
 };
+int qid;
+struct mymsgbuf qbuffer;
+
+void inicializar(); 
 
 int main(int argc, char** argv){
-  struct mymsgbuf qbuffer_rx;
-  struct mymsgbuf qbuffer_tx;
   int i;
-  int error;
-  int error=0;
-  key_t clave;
-  int msgcola_id_rx; //Cola para recibir los pedidos
-  int msgcola_id_tx; //Cola para mandar los pedidos(hay que crearla en otro lado)
   
-  clave=ftok(".",'m');
-  
-  if((msgcola_id_rx=msgget(clave,0))==-1){
-    error=ERR_ABR;
-    if((msgcola_id_tx=msgget(clave,0))==-1){
-       error=ERR_ABR;
-    }
-  }
-   
   while(1){
-   for(i=1;i<=M_TYPES;i++){
-      msgrcv(msgcola_id_rx,&qbuffer_rx,MAX_COLA,i,IPC_NOWAIT);
-      printf("Haciendo el producto %s, por favor espere\n",qbuffer_rx.mtext);
-      sleep(5);
-      qbuffer_tx.mtype=i; //Tipo de la cola receptora, deberia ser igual al que he sacado
-      strncpy(qbuffer_tx.mtext,qbuffer_rx.mtext,MAX_COLA); //Copio en la estructura de la cola transmisora el plato sacado de la cola receptora despues de prepararla
-      msgsnd(msgcola_id_tx,&qbuffer_tx,MAX_COLA,0);
+   for(i=3;i<=5;i++){
+      msgrcv(qid,&qbuffer,MAX_COLA,i,IPC_NOWAIT);
+      printf("Haciendo el producto: %s, por favor espere\n",qbuffer.mtext);
+      sleep(i);
+      qbuffer.mtype=i+3; //Tipo de la cola receptora, deberia ser igual al que he sacado
+      msgsnd(qid,&qbuffer,MAX_COLA,0);
    }
   }
-
-
-
   return 0;
+}
+void inicializar() {
+   //Abrir semaforo
+   clave=ftok(".",'m');
+   if ((qid=msgget(clave,IPC_CREAT|0660))==-1) {
+      printf("Error al iniciar la cola\n");
+   }
 }
