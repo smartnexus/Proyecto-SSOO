@@ -37,7 +37,7 @@ void inicializar();
 int main() {
   int fin=-1;
   int i=0;
-  char *bebidas = "Nada,Cerveza,Coca-Cola,Zumo,Nestea,Aquarius,Agua,Vino";
+  char *bebidas = "Nada,Cerveza,Coca-Cola,Zumo,Nestea,Aquarius,Agua,bibaerVino";
   char *comidas = "Nada,Ensaladilla,Papas Bravas,Ensalada,Tortilla,Puntillitas,Calamares,Revuelto de setas";
   char *postres = "Nada,Flan de huevo,Arroz con leche,Tarta de la abuela,Brownie,Tarta de turron,Helado,Fruta del dia";
   char *pista = "";
@@ -51,6 +51,7 @@ int main() {
     qbuffer.mtype=SERVIR;
     printf("Enviando la carta al cliente en la mesa  %s\n", qbuffer.mtext);
     //TODO: enviar BEBIDA COMIDA POSTRE
+    msgsnd(qid,&qbuffer
 
     while (strcmp(pista,"FIN") != 0){           
       msgrcv(qid, &qbuffer, MAX_COLA, PEDIR, 0);
