@@ -58,9 +58,9 @@ int main() {
       msgsnd(msgqueue_id, &qbuffer, MAX_COLA, 0);
  
       //TODO: Recibir menú y mostrar para selección      
-      printf("=-=-=-=-=-=-=-=-=-=-=\nEl menú de hoy es:\n");
-      printf("1. Bebida\n2. Entrante\n3. Plato\n=-=-=-=-=-=-=-=-=-=-=\n");
-      printf("Para pedir vaya presionando introduciendo el número del producto y un 0 cuando haya terminado la comanda.\n");
+      printf("=-=-=-=-=-=-=-=-=-=-=\n¿Qué desea pedir?:\n");
+      printf("1. Bebida\n2. Entrante\n3. Plato\n0. Nada\n=-=-=-=-=-=-=-=-=-=-=\n");
+      printf("Pulse el número del tipo de producto que desea pedir y un 0 cuando haya terminado la comanda.\n");
       int producto = -1;
       while(producto != 0) {
          printf("Introduzca un número: ");
@@ -101,7 +101,6 @@ int main() {
    }
 }
 
-//TODO: funcion que muestre lista recibida con bebidas, pida numero de la bebida deseada y eso
 void convertToArray(char * arr[], char list[], int size) {
    char *item = strtok(list, ",");
    char **ptr = arr;
