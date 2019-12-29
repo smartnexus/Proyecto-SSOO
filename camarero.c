@@ -51,7 +51,6 @@ int main() {
     qbuffer.mtype=SERVIR;
     printf("Enviando la carta al cliente en la mesa  %s\n", qbuffer.mtext);
     //TODO: enviar BEBIDA COMIDA POSTRE
-    msgsnd(qid,&qbuffer
 
     while (strcmp(pista,"FIN") != 0){           
       msgrcv(qid, &qbuffer, MAX_COLA, PEDIR, 0);
@@ -73,7 +72,7 @@ int main() {
 	printf("El cliente no desea nada mas.\n");
       }
     }
-     for(i=BEBIDAS_SEVIR;i<=POSTRES_SEVIR;i++){ //Camarero recoge las cosas preparadas
+     for(i=BEBIDAS_SERVIR;i<=POSTRES_SERVIR;i++){ //Camarero recoge las cosas preparadas
 	msgrcv(qid,&qbuffer,MAX_COLA,i,IPC_NOWAIT);
 	printf("Producto: %s, listo para sevir\n",qbuffer.mtext);
      }
