@@ -14,9 +14,12 @@
 #define MAX_COLA 200
 #define PEDIR 1
 #define SERVIR 2
-#define BEBIDAS 3
-#define COMIDAS 4
-#define POSTRES 5
+#define BEBIDAS_PEDIR 3
+#define COMIDAS_PEDIR 4
+#define POSTRES_PEDIR 5
+#define BEBIDAS_SERVIR 6
+#define COMIDAS_SERVIR 7
+#define POSTRES_SERVIR 8
 
 key_t clave;
 sem_t *llamar=NULL;
@@ -54,15 +57,15 @@ int main() {
       pista = qbuffer.mtext;
       if(strcmp(pista,"BEBIDA") == 0){
 	printf("Enviando bebidas.\n");
-	enviar_anotar(bebidas, BEBIDAS);
+	enviar_anotar(bebidas, BEBIDAS_PEDIR);
       }
       if( strcmp(pista,"COMIDA") == 0){
 	printf("Enviando comidas.\n");
-	enviar_anotar(comidas, COMIDAS);
+	enviar_anotar(comidas, COMIDAS_PEDIR);
       }
       if( strcmp(pista,"POSTRE") == 0){
 	printf("Enviando postres.\n");
-	enviar_anotar(postres, POSTRES);
+	enviar_anotar(postres, POSTRES_PEDIR);
       }
       if(strcmp(pista,"FIN") == 0){
 	printf("El cliente no desea nada mas.\n");
