@@ -35,26 +35,44 @@ int main() {
   int fin=-1;
   char *bebidas = "Nada,Cerveza,Coca-Cola,Zumo,Nestea,Aquarius,Agua,Vino";
   char *entrantes = "Nada,Ensaladilla,Papas Bravas,Ensalada,Tortilla,Puntillitas,Calamares,Revuelto de setas";
-  char *platos = "Nada,Paella,Solomillo,Entrecot,Bacalao,Arroz con pollo";
+  char *platos = "Nada,Paella,Solomillo,Entrecot,Bacalao,Arroz con pollo, esparragos, comida";
+  char *pista = "";
   inicializar();
-   //TODO: Hacer bucle esperando mensaje de pedir de un cliente.
-   while(fin!=0){
+  //TODO: Hacer bucle esperando mensaje de pedir de un cliente.
+  while(fin!=0){
     //Recibir
-     printf("Esperando la llamada de algun cliente.\n");
-     msgrcv(qid, &qbuffer, MAX_COLA, PEDIR, 0);
-     printf("Nuevo cliente en la mesa %s\n", qbuffer.mtext);
+    printf("Esperando la llamada de algun cliente.\n");
+    msgrcv(qid, &qbuffer, MAX_COLA, PEDIR, 0);
+    printf("Nuevo cliente en la mesa %s\n", qbuffer.mtext);
      
-     qbuffer.mtype=SERVIR;
-     printf("Enviando la carta al cliente en la mesa %s\n", qbuffer.mtext);
-     //Bebidas
-     enviar_anotar(bebidas, BEBIDAS);
-     //Entrantes
-     enviar_anotar(entrantes, ENTRANTES);
-     //Platos
-     enviar_anotar(platos, PLATOS);     
-     
-   }
-   return 0;
+    qbuffer.mtype=SERVIR;
+    printf("Enviando la carta al cliente en la mesa  %s\n", qbuffer.mtext);
+    //////////////////////////////////////////////bien
+    //TODO: enviar BEBIDA COMIDA POSTRE
+
+    while (strcmp(pista,"FIN") != 0){           
+      msgrcv(qid, &qbuffer, MAX_COLA, PEDIR, 0);
+      printf("Recibo %s.\n",qbuffer.mtext);
+      pista = qbuffer.mtext;
+      if(strcmp(pista,"BEBIDA") == 0){
+	printf("Enviando bebidas.\n");
+	enviar_anotar(bebidas, BEBIDAS);
+      }
+      if( strcmp(pista,"COMIDA") == 0){
+	printf("Enviando comidas.\n");
+	enviar_anotar(entrantes, ENTRANTES);
+      }
+      if( strcmp(pista,"POSTRE") == 0){
+	printf("Enviando postres.\n");
+	enviar_anotar(platos, PLATOS);
+      }
+      if(strcmp(pista,"FIN") == 0){
+	printf("El cliente no desea nada mas.\n");
+      }
+    }
+  }
+   
+  return 0;
 }
 //Funciones
 void inicializar() {
@@ -67,23 +85,24 @@ void inicializar() {
 }
 
 void enviar_anotar(char *lista, int tipo){
-  char  *pedido="";
-   //Enviar bebidas
-     printf(" lista %s\n",lista);
-     strncpy(qbuffer.mtext,lista,MAX_COLA);
-     qbuffer.mtype=SERVIR;
-     printf(" buffer %s\n",qbuffer.mtext);
-     msgsnd(qid, &qbuffer, MAX_COLA, 0);
-     //Recibo pedidos de bebidas
-     while(strcmp(pedido,"FIN") != 0){
-       msgrcv(qid, &qbuffer, MAX_COLA, PEDIR, 0);
-       pedido = qbuffer.mtext;
-       //Añadir pedido a la cola que leera el cocinero
-       qbuffer.mtype=tipo;
-       msgsnd(qid,&qbuffer,MAX_COLA,0);
-       if (strcmp(pedido,"FIN") != 0)
-	 printf("Anotado pedido: %s\n ", pedido);
-     }
+  int pedido=-1;
+  //Enviar carta
+  printf(" lista %s\n",lista);
+  strncpy(qbuffer.mtext,lista,MAX_COLA);
+  qbuffer.mtype=SERVIR;
+  msgsnd(qid, &qbuffer, MAX_COLA, 0);
+  printf("Esperando a que los clientes decinan lo que desean tomar.\n");
+  //Recibir pedidos
+  while(pedido!=0){
+    msgrcv(qid, &qbuffer, MAX_COLA, PEDIR, 0);
+    pedido = atoi(qbuffer.mtext);
+    //Añadir pedido a la cola que leera el cocinero
+    if(pedido!=0){
+      qbuffer.mtype=tipo;
+      msgsnd(qid,&qbuffer,MAX_COLA,0);
+      printf("Anotado pedido: %d\n", pedido);
+    }
+  }
 }
 
 
