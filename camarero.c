@@ -36,6 +36,7 @@ void inicializar();
 
 int main() {
   int fin=-1;
+  int i=0;
   char *bebidas = "Nada,Cerveza,Coca-Cola,Zumo,Nestea,Aquarius,Agua,Vino";
   char *comidas = "Nada,Ensaladilla,Papas Bravas,Ensalada,Tortilla,Puntillitas,Calamares,Revuelto de setas";
   char *postres = "Nada,Flan de huevo,Arroz con leche,Tarta de la abuela,Brownie,Tarta de turron,Helado,Fruta del dia";
@@ -71,6 +72,10 @@ int main() {
 	printf("El cliente no desea nada mas.\n");
       }
     }
+     for(i=BEBIDAS_SEVIR;i<=POSTRES_SEVIR;i++){ //Camarero recoge las cosas preparadas
+	msgrcv(qid,&qbuffer,MAX_COLA,i,IPC_NOWAIT);
+	printf("Producto: %s, listo para sevir\n",qbuffer.mtext);
+     }
   }
    
   return 0;
