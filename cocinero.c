@@ -27,17 +27,16 @@ void inicializar();
 int main(int argc, char** argv){
   int i;
   int j;
-  
+  inicializar();
   while(1){
    for(i=BEBIDAS_PREPARAR;i<=POSTRES_PREPARAR;i++){
-      if((msgrcv(qid,&qbuffer,MAX_COLA,i,IPC_NOWAIT))!=0){
+      if((msgrcv(qid,&qbuffer,MAX_COLA,i,IPC_NOWAIT))!=-1){
          printf("Haciendo el producto: %s, por favor espere\n",qbuffer.mtext);
          sleep(i);
          j=i;
          qbuffer.mtype=j+3; //Tipo de las cosas enviar es igual +3
          msgsnd(qid,&qbuffer,MAX_COLA,IPC_NOWAIT);
         }
-      printf("Esperando estoy\n");
    }
   }
   return 0;
