@@ -30,12 +30,14 @@ int main(int argc, char** argv){
   
   while(1){
    for(i=BEBIDAS_PREPARAR;i<=POSTRES_PREPARAR;i++){
-      msgrcv(qid,&qbuffer,MAX_COLA,i,IPC_NOWAIT);
-      printf("Haciendo el producto: %s, por favor espere\n",qbuffer.mtext);
-      sleep(i);
-      j=i;
-      qbuffer.mtype=j+3; //Tipo de las cosas enviar es igual +3
-      msgsnd(qid,&qbuffer,MAX_COLA,IPC_NOWAIT);
+      if((msgrcv(qid,&qbuffer,MAX_COLA,i,IPC_NOWAIT))!=0){
+         printf("Haciendo el producto: %s, por favor espere\n",qbuffer.mtext);
+         sleep(i);
+         j=i;
+         qbuffer.mtype=j+3; //Tipo de las cosas enviar es igual +3
+         msgsnd(qid,&qbuffer,MAX_COLA,IPC_NOWAIT);
+        }
+      printf("Esperando estoy\n");
    }
   }
   return 0;
