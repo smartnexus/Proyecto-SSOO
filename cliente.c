@@ -59,7 +59,7 @@ int main() {
  
       //TODO: Recibir menú y mostrar para selección      
       printf("=-=-=-=-=-=-=-=-=-=-=\n¿Qué desea pedir?:\n");
-      printf("1. Bebida\n2. Entrante\n3. Plato\n0. Nada\n=-=-=-=-=-=-=-=-=-=-=\n");
+      printf("1. Bebida\n2. Comida\n3. Postre\n0. Nada\n=-=-=-=-=-=-=-=-=-=-=\n");
       printf("Pulse el número del tipo de producto que desea pedir y un 0 cuando haya terminado la comanda.\n");
       int producto = -1;
       while(producto != 0) {
