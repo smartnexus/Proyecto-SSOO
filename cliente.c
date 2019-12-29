@@ -12,7 +12,7 @@
 #include <sys/shm.h>
 #include <assert.h>
 
-#define MAX_COLA 80
+#define MAX_COLA 200
 #define PEDIR 1
 #define SERVIR 2
 
@@ -26,28 +26,10 @@ sem_t *llamar=NULL;
 int msgqueue_id;
 struct mymsgbuf qbuffer;
 
-void convertToArray(char * arr[], char list[], int size) {
-   char *item = strtok(list, ",");
-   char **ptr = arr;
-
-   int i = 0;
-   while(item != NULL) {
-      ptr[i] = item;
-      item = strtok(NULL, ",");
-      i++;
-   }
-   for (i = 0; i < size; i++)
-      printf("String %d : %s\n", i+1, ptr[i]);
-}
-
-void inicializar() {
-   //Abrir semaforo
-   llamar = sem_open("llamar_camarero", 0);
-   clave=ftok(".",'m');
-   if ((msgqueue_id=msgget(clave,IPC_CREAT|0660))==-1) {
-      printf("Error al iniciar la cola\n");
-   }
-}
+//Declaracion de funciones
+void convertToArray(char * arr[], char list[], int size);
+void inicializar();
+void carta_pedir(char *tipo);
 
 int main() {
    int num_mesa=0;
@@ -73,24 +55,9 @@ int main() {
       char mesa[10];
       sprintf(mesa, "%d", num_mesa); 
       strncpy(qbuffer.mtext, mesa, MAX_COLA);
-      msgsnd(msgqueue_id, &qbuffer, MAX_COLA, 0); 
-      msgrcv(msgqueue_id, &qbuffer, MAX_COLA, SERVIR, 0);
-      char bebidas[] = qbuffer.mtext;
-      msgrcv(msgqueue_id, &qbuffer, MAX_COLA, SERVIR, 0);
-      char comidas[] = qbuffer.mtext;
-      msgrcv(msgqueue_id, &qbuffer, MAX_COLA, SERVIR, 0);
-      char postres[] = qbuffer.mtext;
-      
-      char *lista_bebidas[10];
-      convertToArray(lista_bebidas, bebidas, 10); 
-      char *lista_comidas[10];
-      convertToArray(lista_comidas, comidas, 10); 
-      char *lista_postres[10];
-      convertToArray(lista_postres, postres, 10);
-
-
-      //TODO: Recibir menú y mostrar para selección.
-      
+      msgsnd(msgqueue_id, &qbuffer, MAX_COLA, 0);
+ 
+      //TODO: Recibir menú y mostrar para selección      
       printf("=-=-=-=-=-=-=-=-=-=-=\nEl menú de hoy es:\n");
       printf("1. Bebida\n2. Entrante\n3. Plato\n=-=-=-=-=-=-=-=-=-=-=\n");
       printf("Para pedir vaya presionando introduciendo el número del producto y un 0 cuando haya terminado la comanda.\n");
@@ -104,28 +71,72 @@ int main() {
                qbuffer.mtype=PEDIR;
                strncpy(qbuffer.mtext, "BEBIDA", MAX_COLA);
                msgsnd(msgqueue_id, &qbuffer, MAX_COLA, 0);
-               break; 
+	       carta_pedir ("BEBIDA");
+	       break; 
             case 2:
                printf("Producto seleccionado: 1x COMIDA\n");
                qbuffer.mtype=PEDIR;
                strncpy(qbuffer.mtext, "COMIDA", MAX_COLA);
                msgsnd(msgqueue_id, &qbuffer, MAX_COLA, 0);
+	       carta_pedir ("COMIDA");
                break;
             case 3:
                printf("Producto seleccionado: 1x POSTRE\n");
                qbuffer.mtype=PEDIR;
                strncpy(qbuffer.mtext, "POSTRE", MAX_COLA);
                msgsnd(msgqueue_id, &qbuffer, MAX_COLA, 0);
+	       carta_pedir ("POSTRE");
                break;
             case 0:
                printf("Finalizando servicio.\n");
                qbuffer.mtype=PEDIR;
                strncpy(qbuffer.mtext, "FIN", MAX_COLA);
                msgsnd(msgqueue_id, &qbuffer, MAX_COLA, 0);
+	       sem_post(llamar);
                break;
          }
       }
    } else {
       printf("La entrada introducida es incorrecta.\n");
    }
+}
+
+//TODO: funcion que muestre lista recibida con bebidas, pida numero de la bebida deseada y eso
+void convertToArray(char * arr[], char list[], int size) {
+   char *item = strtok(list, ",");
+   char **ptr = arr;
+
+   int i = 0;
+   while(item != NULL) {
+      ptr[i] = item;
+      item = strtok(NULL, ",");
+      i++;
+   }
+   for (i = 0; i < size; i++)
+      printf(" %d   ----   %s\n", i, ptr[i]);
+}
+
+void inicializar() {
+   //Abrir semaforo
+   llamar = sem_open("llamar_camarero", 0);
+   clave=ftok(".",'m');
+   if ((msgqueue_id=msgget(clave,IPC_CREAT|0660))==-1) {
+      printf("Error al iniciar la cola\n");
+   }
+}
+void carta_pedir (char *tipo){
+    //Recibir lista
+    msgrcv(msgqueue_id, &qbuffer, MAX_COLA, SERVIR, 0);
+    printf("%s: %s\n",tipo,qbuffer.mtext);
+    char *carta_cad = qbuffer.mtext;
+    char *carta_lista [8];
+    convertToArray(carta_lista, carta_cad, 8); 
+    int pedido=-1;
+    while (pedido!=0){
+      printf("Introduzca el nº de lo que desea pedir: ");
+      scanf("%d",&pedido);
+      qbuffer.mtype=PEDIR;
+      sprintf(qbuffer.mtext, "%d", pedido);
+      msgsnd(msgqueue_id,&qbuffer,MAX_COLA,0);
+  }
 }
