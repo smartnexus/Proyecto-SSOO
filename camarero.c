@@ -14,9 +14,12 @@
 #define MAX_COLA 200
 #define PEDIR 1
 #define SERVIR 2
-#define BEBIDAS 3
-#define COMIDAS 4
-#define POSTRES 5
+#define BEBIDAS_PEDIR 3
+#define COMIDAS_PEDIR 4
+#define POSTRES_PEDIR 5
+#define BEBIDAS_SERVIR 6
+#define COMIDAS_SERVIR 7
+#define POSTRES_SERVIR 8
 
 key_t clave;
 sem_t *llamar=NULL;
@@ -33,7 +36,8 @@ void inicializar();
 
 int main() {
   int fin=-1;
-  char *bebidas = "Nada,Cerveza,Coca-Cola,Zumo,Nestea,Aquarius,Agua,Vino";
+  int i=0;
+  char *bebidas = "Nada,Cerveza,Coca-Cola,Zumo,Nestea,Aquarius,Agua,bibaerVino";
   char *comidas = "Nada,Ensaladilla,Papas Bravas,Ensalada,Tortilla,Puntillitas,Calamares,Revuelto de setas";
   char *postres = "Nada,Flan de huevo,Arroz con leche,Tarta de la abuela,Brownie,Tarta de turron,Helado,Fruta del dia";
   char *pista = "";
@@ -47,6 +51,7 @@ int main() {
     qbuffer.mtype=SERVIR;
     printf("Enviando la carta al cliente en la mesa  %s\n", qbuffer.mtext);
     //TODO: enviar BEBIDA COMIDA POSTRE
+    msgsnd(qid,&qbuffer
 
     while (strcmp(pista,"FIN") != 0){           
       msgrcv(qid, &qbuffer, MAX_COLA, PEDIR, 0);
@@ -54,20 +59,24 @@ int main() {
       pista = qbuffer.mtext;
       if(strcmp(pista,"BEBIDA") == 0){
 	printf("Enviando bebidas.\n");
-	enviar_anotar(bebidas, BEBIDAS);
+	enviar_anotar(bebidas, BEBIDAS_PEDIR);
       }
       if( strcmp(pista,"COMIDA") == 0){
 	printf("Enviando comidas.\n");
-	enviar_anotar(comidas, COMIDAS);
+	enviar_anotar(comidas, COMIDAS_PEDIR);
       }
       if( strcmp(pista,"POSTRE") == 0){
 	printf("Enviando postres.\n");
-	enviar_anotar(postres, POSTRES);
+	enviar_anotar(postres, POSTRES_PEDIR);
       }
       if(strcmp(pista,"FIN") == 0){
 	printf("El cliente no desea nada mas.\n");
       }
     }
+     for(i=BEBIDAS_SEVIR;i<=POSTRES_SEVIR;i++){ //Camarero recoge las cosas preparadas
+	msgrcv(qid,&qbuffer,MAX_COLA,i,IPC_NOWAIT);
+	printf("Producto: %s, listo para sevir\n",qbuffer.mtext);
+     }
   }
    
   return 0;
