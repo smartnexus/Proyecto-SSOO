@@ -24,6 +24,7 @@
 key_t clave;
 sem_t *llamar=NULL;
 int qid;
+int pid;
 struct mymsgbuf qbuffer;
 struct mymsgbuf{
    long mtype;
@@ -31,6 +32,7 @@ struct mymsgbuf{
 };
 void inicializar();
 void recoger();
+void convertToArray(char * arr[], char list[], int size);
 
 int main(){
    int fin=-1;
@@ -49,10 +51,25 @@ int main(){
 
    return 0;
 }
+void convertToArray(char * arr[], char list[], int size) {
+   char *item = strtok(list, "-");
+   char **ptr = arr;
+
+   int i = 0;
+   while(item != NULL) {
+      ptr[i] = item;
+      item = strtok(NULL, ",");
+      i++;
+   }
+}
 void recoger() {
    printf("Señal para recoger recibida.\n");
    while(msgrcv(qid,&qbuffer,MAX_COLA,RECOGER_SERVIR,IPC_NOWAIT)!=-1) {
-      printf("Producto: %s, listo para servir\n",qbuffer.mtext);
+      char *arr[2];
+      char **ptr = arr;
+      convertToArray(arr, qbuffer.mtext, 2);
+      int num_pedido = atoi(ptr[0]);
+      printf("[Mesa %s] Producto: %d, ¡Listo para entregar!\n", ptr[1], num_pedido);
    }
 }
 void inicializar() {
@@ -62,10 +79,11 @@ void inicializar() {
    if ((qid=msgget(clave,IPC_CREAT|0660))==-1) {
       printf("Error al iniciar la cola\n");
    }
-   int pid = getpid();
+   pid = getpid();
    char pid_t[10];
    sprintf(pid_t, "%d", pid);
    qbuffer.mtype=SINCRO;
    strncpy(qbuffer.mtext, pid_t, MAX_COLA);
    msgsnd(qid,&qbuffer,MAX_COLA,IPC_NOWAIT);
+   printf("Iniciando sincronización... (PID: %d)\n", pid);
 }

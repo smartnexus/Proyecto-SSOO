@@ -24,28 +24,20 @@ struct mymsgbuf{
 key_t clave;
 sem_t *llamar=NULL;
 int msgqueue_id;
+int pid;
 struct mymsgbuf qbuffer;
 
 //Declaracion de funciones
 void convertToArray(char * arr[], char list[], int size);
+void componer_msg (char pedido_c[10], int pedido, int pid);
 void inicializar();
 void carta_pedir(char *tipo);
 
 int main() {
-   int num_mesa=0;
    int error=1;
    inicializar();
-   while (error==1){
-      printf("¡Bienvenido!, por favor indique el ńumero de mesa: ");
-      scanf("%d", &num_mesa);
-      if(num_mesa > 0) {
-         error=0;
-      } else {
-         printf("Número erróneo.\n");
-      }
-   }
-   fgetc(stdin);   
-   printf("Pulse ENTER para llamar al camarero.");
+   printf("¡Bienvenido!, su número de mesa es: %d\n", pid);   
+   printf("Pulse ENTER para llamar al camarero ");
    char ch=fgetc(stdin);
    if(ch==0x0A) {
       printf("Se ha llamado al camarero, espere por favor.\n");
@@ -53,7 +45,7 @@ int main() {
       //TODO: Enviar mensaje de pedir por cola y recibir menú. Cómo solo hay una cola entre camarero y mesas el tipo es 1 para pedir y 2 para servir.
       qbuffer.mtype=PEDIR;
       char mesa[10];
-      sprintf(mesa, "%d", num_mesa); 
+      sprintf(mesa, "%d", pid); 
       strncpy(qbuffer.mtext, mesa, MAX_COLA);
       msgsnd(msgqueue_id, &qbuffer, MAX_COLA, 0);
  
@@ -126,6 +118,14 @@ void inicializar() {
    if ((msgqueue_id=msgget(clave,IPC_CREAT|0660))==-1) {
       printf("Error al iniciar la cola\n");
    }
+   pid = getpid();
+}
+void componer_msg (char pedido_c[10], int pedido, int pid) {
+   char pid_c[5];
+   sprintf(pedido_c, "%d", pedido);
+   sprintf(pid_c, "%d", pid);
+   strcat(pedido_c, "-");
+   strcat(pedido_c, pid_c);
 }
 void carta_pedir (char *tipo){
     //Recibir lista
@@ -139,7 +139,9 @@ void carta_pedir (char *tipo){
       printf("Introduzca el nº de lo que desea pedir: ");
       scanf("%d",&pedido);
       qbuffer.mtype=PEDIR;
-      sprintf(qbuffer.mtext, "%d", pedido);
+      char pedido_c[10];
+      componer_msg(pedido_c, pedido, pid);
+      strncpy(qbuffer.mtext, pedido_c, MAX_COLA);
       msgsnd(msgqueue_id,&qbuffer,MAX_COLA,0);
   }
 }

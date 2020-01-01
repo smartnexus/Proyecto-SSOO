@@ -25,6 +25,8 @@ struct mymsgbuf qbuffer;
 int pid;
 
 void inicializar(); 
+void convertToArray(char * arr[], char list[], int size);
+void componer_msg (char pedido_c[10], int pedido, int pid);
 
 int main(int argc, char** argv){
    int i;
@@ -32,34 +34,54 @@ int main(int argc, char** argv){
    char pedido[5];
    char *bebidas[] = {"Nada","Cerveza","Coca-Cola","Zumo","Nestea","Aquarius","Agua","bibaerVino"};
    char *comidas[] = {"Nada","Ensaladilla","Papas Bravas","Ensalada","Tortilla","Puntillitas","Calamares","Revuelto de setas"};
-   char *postres[] = {"Nada","Flan de huevo","Arroz con leche","Tarta de la abuela","Brownie","Tarta de turron","Helado","Fruta del dia"};
+   char *postres[] = {"Nada","Flan de huevo","Arroz con leche","Tarta de la visabuela","Brownie","Tarta de turrazos matematicos","Helado","Fruta del dia"};
    inicializar();
    while(1) {
       for(i=BEBIDAS_PREPARAR;i<=POSTRES_PREPARAR;i++){
          if((msgrcv(qid,&qbuffer,MAX_COLA,i,IPC_NOWAIT))!=-1){
+            char *arr[2];
+            char **ptr = arr;
+            convertToArray(arr, qbuffer.mtext, 2);
+            num_pedido = atoi(ptr[0]);
 	    if(i==BEBIDAS_PREPARAR){
-	       num_pedido = atoi(qbuffer.mtext);
-	       printf("Preparando el producto: %s. (Tiempo de preparación %d segundos)\n",bebidas[num_pedido],i);
+	       printf("[Mesa %s] Preparando el producto: %s. (Tiempo de preparación %d segundos)\n", ptr[1], bebidas[num_pedido], i);
 	    }
  	    if(i==COMIDAS_PREPARAR){
-	       num_pedido = atoi(qbuffer.mtext);
-	       printf("Preparando el producto: %s, (Tiempo de preparación %d segundos)\n",comidas[num_pedido],i);
+	       printf("[Mesa %s] Preparando el producto: %s, (Tiempo de preparación %d segundos)\n", ptr[1], comidas[num_pedido], i);
  	    }
 	    if(i==POSTRES_PREPARAR){
-	       num_pedido = atoi(qbuffer.mtext);
-	       printf("Preparando el producto: %s, (Tiempo de preparación %d segundos)\n",postres[num_pedido],i);
+	       printf("[Mesa %s] Preparando el producto: %s, (Tiempo de preparación %d segundos)\n", ptr[1], postres[num_pedido], i);
 	    }
             sleep(i);
             qbuffer.mtype=PEDIDOS_SERVIR;
-            sprintf(pedido, "%d", num_pedido);
-            strncpy(qbuffer.mtext, pedido, MAX_COLA);
+            char pedido_c[10];
+            componer_msg(pedido_c, num_pedido, atoi(ptr[1]));
+            strncpy(qbuffer.mtext, pedido_c, MAX_COLA);
             msgsnd(qid,&qbuffer,MAX_COLA,IPC_NOWAIT);
-	    printf("Listo.\n");
+	    printf("[Mesa %s] ¡Listo!\n", ptr[1]);
             kill(pid, SIGALRM);
          }
       }
    }
    return 0;
+}
+void convertToArray(char * arr[], char list[], int size) {
+   char *item = strtok(list, "-");
+   char **ptr = arr;
+
+   int i = 0;
+   while(item != NULL) {
+      ptr[i] = item;
+      item = strtok(NULL, ",");
+      i++;
+   }
+}
+void componer_msg (char pedido_c[10], int pedido, int pid) {
+   char pid_c[5];
+   sprintf(pedido_c, "%d", pedido);
+   sprintf(pid_c, "%d", pid);
+   strcat(pedido_c, "-");
+   strcat(pedido_c, pid_c);
 }
 void inicializar() {
    key_t clave;
@@ -70,5 +92,5 @@ void inicializar() {
    printf("Esperando sicronismo con servidor...\n");
    msgrcv(qid,&qbuffer,MAX_COLA,SINCRO,0);
    pid = atoi(qbuffer.mtext);
-   printf("Cocina lista. PID:%d\n", pid);
+   printf("Cocina lista. PID: %d\n", pid);
 }
