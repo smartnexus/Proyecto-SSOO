@@ -95,7 +95,11 @@ int main() {
 	       sem_post(llamar);
                break;
          }
+
       }
+      	 //Esperar a recibir pedidos
+	 printf("Esperando pedidos...\n");
+	 pause();
    } else {
       printf("La entrada introducida es incorrecta.\n");
    }
