@@ -25,16 +25,17 @@ key_t clave;
 sem_t *llamar=NULL;
 int msgqueue_id;
 int pid;
+int contador_ped=0;
 struct mymsgbuf qbuffer;
 
 //Declaracion de funciones
 void convertToArray(char * arr[], char list[], int size);
 void componer_msg (char pedido_c[10], int pedido, int pid);
 void inicializar();
-void carta_pedir(char *tipo);
+void carta_pedir();
+void recibir();
 
 int main() {
-   int error=1;
    inicializar();
    printf("¡Bienvenido!, su número de mesa es: %d\n", pid);   
    printf("Pulse ENTER para llamar al camarero ");
@@ -90,8 +91,11 @@ int main() {
 
       }
       	 //Esperar a recibir pedidos
-	 printf("Esperando pedidos...\n");
-	 pause();
+      printf("Esperando %d pedidos...\n", contador_ped);
+      while(contador_ped!=0){
+	recibir();
+      }
+      printf("Todo entredago, ¡gracias por su visita!\n");
    } else {
       printf("La entrada introducida es incorrecta.\n");
    }
@@ -127,7 +131,7 @@ void componer_msg (char pedido_c[10], int pedido, int pid) {
    strcat(pedido_c, "-");
    strcat(pedido_c, pid_c);
 }
-void carta_pedir (char *tipo){
+void carta_pedir (){
     //Recibir lista
     msgrcv(msgqueue_id, &qbuffer, MAX_COLA, SERVIR, 0);
     printf("[%s].\n", qbuffer.mtext);
@@ -143,5 +147,13 @@ void carta_pedir (char *tipo){
       componer_msg(pedido_c, pedido, pid);
       strncpy(qbuffer.mtext, pedido_c, MAX_COLA);
       msgsnd(msgqueue_id,&qbuffer,MAX_COLA,0);
-  }
+      if (pedido!=0)
+	contador_ped++;
+    }
+}
+void recibir(){
+  if(msgrcv(msgqueue_id,&qbuffer,MAX_COLA,pid,IPC_NOWAIT)!=-1) {
+      printf("[Mesa %d] Producto: %s recibido.\n", pid, qbuffer.mtext);
+      contador_ped--;
+   }
 }
