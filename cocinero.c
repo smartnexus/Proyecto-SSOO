@@ -11,9 +11,7 @@
 #define BEBIDAS_PREPARAR 3  //Numero de cosas diferentes a servir de mas prioritarias a menos(bebidas,comidas y postres)
 #define COMIDAS_PREPARAR 4
 #define POSTRES_PREPARAR 5
-#define BEBIDAS_SERVIR 6
-#define COMIDAS_SERVIR 7
-#define POSTRES_SERVIR 8
+#define PEDIDOS_SERVIR 6
 
 struct mymsgbuf{ 
    long mtype; 
@@ -28,6 +26,7 @@ int main(int argc, char** argv){
   int i;
   int j;
   int num_pedido;
+  char pedido[5];
   char *bebidas[] = {"Nada","Cerveza","Coca-Cola","Zumo","Nestea","Aquarius","Agua","bibaerVino"};
   char *comidas[] = {"Nada","Ensaladilla","Papas Bravas","Ensalada","Tortilla","Puntillitas","Calamares","Revuelto de setas"};
   char *postres[] = {"Nada","Flan de huevo","Arroz con leche","Tarta de la abuela","Brownie","Tarta de turron","Helado","Fruta del dia"};
@@ -48,8 +47,9 @@ int main(int argc, char** argv){
 	  printf("Preparando el producto: %s, por favor espere %d segundos.\n",postres[num_pedido],i);
 	}
          sleep(i);
-         j=i;
-         qbuffer.mtype=j+3; //Tipo de las cosas enviar es igual +3
+         qbuffer.mtype=PEDIDOS_SERVIR;
+         sprintf(pedido, "%d", num_pedido);
+         strncpy(qbuffer.mtext, pedido, MAX_COLA);
          msgsnd(qid,&qbuffer,MAX_COLA,IPC_NOWAIT);
 	 printf("Listo.\n");
         }

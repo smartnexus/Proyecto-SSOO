@@ -17,9 +17,7 @@
 #define BEBIDAS_PEDIR 3
 #define COMIDAS_PEDIR 4
 #define POSTRES_PEDIR 5
-#define BEBIDAS_SERVIR 6
-#define COMIDAS_SERVIR 7
-#define POSTRES_SERVIR 8
+#define RECOGER_SERVIR 6
 
 key_t clave;
 sem_t *llamar=NULL;
@@ -43,16 +41,21 @@ int main() {
   char *pista = "";
   inicializar();
   //TODO: Hacer bucle esperando mensaje de pedir de un cliente.
+  while(fin!=0) {
+    if(msgrcv(qid,&qbuffer,MAX_COLA,RECOGER_SERVIR,IPC_NOWAIT)!=-1) {
+       printf("Producto: %s, listo para sevir\n",qbuffer.mtext);
+    }
+  } 
   while(fin!=0){
-      printf("Esperando la llamada de algun cliente.\n");
-      msgrcv(qid, &qbuffer, MAX_COLA, PEDIR, 0);
+    printf("Esperando la llamada de algun cliente.\n");
+    msgrcv(qid, &qbuffer, MAX_COLA, PEDIR, 0);
     //Recibir
     printf("Nuevo cliente en la mesa %s\n", qbuffer.mtext);     
     qbuffer.mtype=SERVIR;
-    printf("Enviando la carta al cliente en la mesa  %s\n", qbuffer.mtext);
+    printf("Enviando la carta principal a la mesa %s\n", qbuffer.mtext);
     //TODO: enviar BEBIDA COMIDA POSTRE
 
-    while (strcmp(pista,"FIN") != 0){           
+    while (strcmp(pista,"FIN") != 0) {           
       msgrcv(qid, &qbuffer, MAX_COLA, PEDIR, 0);
       printf("Recibo %s.\n",qbuffer.mtext);
       pista = qbuffer.mtext;
@@ -72,14 +75,9 @@ int main() {
 	printf("El cliente no desea nada mas.\n");
       }
     }
-
-     for(i=BEBIDAS_SERVIR;i<=POSTRES_SERVIR;i++){ //Camarero recoge las cosas preparadas
-       msgrcv(qid,&qbuffer,MAX_COLA,i,IPC_NOWAIT);
-	printf("Producto: %s, listo para sevir\n",qbuffer.mtext);
        
 	// qbuffer.mtype=SERVIR;
 	//	msgsnd(qid,&qbuffer,MAX_COLA,IPC_NOWAIT); //Camarero le envia a los clientes las cosas hechas ¿Cliente no tiene nada aun para recibir los productos hechos?
-     }
   }
   return 0;
 }
