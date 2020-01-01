@@ -1,4 +1,3 @@
-# Proyecto-SSOO
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <ctype.h> 
@@ -27,20 +26,23 @@ void inicializar();
 
 int main(int argc, char** argv){
   int i;
-  
+  int j;
+  inicializar();
   while(1){
-   for(i=3;i<=5;i++){
-      msgrcv(qid,&qbuffer,MAX_COLA,i,IPC_NOWAIT);
-      printf("Haciendo el producto: %s, por favor espere\n",qbuffer.mtext);
-      sleep(i);
-      qbuffer.mtype=i+3; //Tipo de la cola receptora, deberia ser igual al que he sacado
-      msgsnd(qid,&qbuffer,MAX_COLA,0);
+   for(i=BEBIDAS_PREPARAR;i<=POSTRES_PREPARAR;i++){
+      if((msgrcv(qid,&qbuffer,MAX_COLA,i,IPC_NOWAIT))!=-1){
+         printf("Haciendo el producto: %s, por favor espere\n",qbuffer.mtext);
+         sleep(i);
+         j=i;
+         qbuffer.mtype=j+3; //Tipo de las cosas enviar es igual +3
+         msgsnd(qid,&qbuffer,MAX_COLA,IPC_NOWAIT);
+        }
    }
   }
   return 0;
 }
 void inicializar() {
-   //Abrir semaforo
+   key_t clave;
    clave=ftok(".",'m');
    if ((qid=msgget(clave,IPC_CREAT|0660))==-1) {
       printf("Error al iniciar la cola\n");
