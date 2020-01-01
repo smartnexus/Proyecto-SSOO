@@ -27,15 +27,31 @@ void inicializar();
 int main(int argc, char** argv){
   int i;
   int j;
+  int num_pedido;
+  char *bebidas[] = {"Nada","Cerveza","Coca-Cola","Zumo","Nestea","Aquarius","Agua","bibaerVino"};
+  char *comidas[] = {"Nada","Ensaladilla","Papas Bravas","Ensalada","Tortilla","Puntillitas","Calamares","Revuelto de setas"};
+  char *postres[] = {"Nada","Flan de huevo","Arroz con leche","Tarta de la abuela","Brownie","Tarta de turron","Helado","Fruta del dia"};
   inicializar();
   while(1){
    for(i=BEBIDAS_PREPARAR;i<=POSTRES_PREPARAR;i++){
       if((msgrcv(qid,&qbuffer,MAX_COLA,i,IPC_NOWAIT))!=-1){
-         printf("Haciendo el producto: %s, por favor espere\n",qbuffer.mtext);
+	if(i==BEBIDAS_PREPARAR){
+	  num_pedido = atoi(qbuffer.mtext);
+	  printf("Preparando el producto: %s, por favor espere %d segundos.\n",bebidas[num_pedido],i);
+	}
+	if(i==COMIDAS_PREPARAR){
+	  num_pedido = atoi(qbuffer.mtext);
+	  printf("Preparando el producto: %s, por favor espere %d segundos.\n",comidas[num_pedido],i);
+	}
+	if(i==POSTRES_PREPARAR){
+	  num_pedido = atoi(qbuffer.mtext);
+	  printf("Preparando el producto: %s, por favor espere %d segundos.\n",postres[num_pedido],i);
+	}
          sleep(i);
          j=i;
          qbuffer.mtype=j+3; //Tipo de las cosas enviar es igual +3
          msgsnd(qid,&qbuffer,MAX_COLA,IPC_NOWAIT);
+	 printf("Listo.\n");
         }
    }
   }
