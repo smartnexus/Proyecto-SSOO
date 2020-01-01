@@ -67,7 +67,7 @@ int main() {
          scanf("%d", &producto);
          switch(producto) {
             case 1:
-               printf("Carte seleccionada: BEBIDA ");
+               printf("Carta seleccionada: BEBIDA ");
                qbuffer.mtype=PEDIR;
                strncpy(qbuffer.mtext, "BEBIDA", MAX_COLA);
                msgsnd(msgqueue_id, &qbuffer, MAX_COLA, 0);
