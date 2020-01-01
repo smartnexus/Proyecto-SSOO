@@ -32,10 +32,9 @@ struct mymsgbuf{
 };
 void inicializar();
 void recoger();
-void convertToArray(char * arr[], char list[], int size);
-
+void convertToArray(char * arr[], char list[]);
+void servir(char *pid, int pedido);
 int main(){
-   int fin=-1;
    struct sigaction act;
    inicializar();
 
@@ -51,7 +50,7 @@ int main(){
 
    return 0;
 }
-void convertToArray(char * arr[], char list[], int size) {
+void convertToArray(char * arr[], char list[]) {
    char *item = strtok(list, "-");
    char **ptr = arr;
 
@@ -67,9 +66,10 @@ void recoger() {
    while(msgrcv(qid,&qbuffer,MAX_COLA,RECOGER_SERVIR,IPC_NOWAIT)!=-1) {
       char *arr[2];
       char **ptr = arr;
-      convertToArray(arr, qbuffer.mtext, 2);
+      convertToArray(arr, qbuffer.mtext);
       int num_pedido = atoi(ptr[0]);
       printf("[Mesa %s] Producto: %d, ¡Listo para entregar!\n", ptr[1], num_pedido);
+      servir(ptr[1], num_pedido);
    }
 }
 void inicializar() {
@@ -86,4 +86,12 @@ void inicializar() {
    strncpy(qbuffer.mtext, pid_t, MAX_COLA);
    msgsnd(qid,&qbuffer,MAX_COLA,IPC_NOWAIT);
    printf("Iniciando sincronización... (PID: %d)\n", pid);
+}
+void servir(char *pid_cli, int num_pedido){
+  qbuffer.mtype = atoi(pid_cli);
+  char pedido[2];
+  sprintf(pedido, "%d", num_pedido);
+  strncpy(qbuffer.mtext, pedido, MAX_COLA);
+  msgsnd(qid,&qbuffer,MAX_COLA,0);
+  printf("[Mesa %s] Producto: %d entregado.\n",pid_cli, num_pedido);
 }
