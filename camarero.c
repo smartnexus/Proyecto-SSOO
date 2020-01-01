@@ -44,9 +44,9 @@ int main() {
   inicializar();
   //TODO: Hacer bucle esperando mensaje de pedir de un cliente.
   while(fin!=0){
+      printf("Esperando la llamada de algun cliente.\n");
+      msgrcv(qid, &qbuffer, MAX_COLA, PEDIR, 0);
     //Recibir
-    printf("Esperando la llamada de algun cliente.\n");
-    msgrcv(qid, &qbuffer, MAX_COLA, PEDIR, 0);
     printf("Nuevo cliente en la mesa %s\n", qbuffer.mtext);     
     qbuffer.mtype=SERVIR;
     printf("Enviando la carta al cliente en la mesa  %s\n", qbuffer.mtext);
@@ -72,14 +72,15 @@ int main() {
 	printf("El cliente no desea nada mas.\n");
       }
     }
+
      for(i=BEBIDAS_SERVIR;i<=POSTRES_SERVIR;i++){ //Camarero recoge las cosas preparadas
-	msgrcv(qid,&qbuffer,MAX_COLA,i,IPC_NOWAIT);
+       msgrcv(qid,&qbuffer,MAX_COLA,i,IPC_NOWAIT);
 	printf("Producto: %s, listo para sevir\n",qbuffer.mtext);
-	qbuffer.mtype=SERVIR;
-	msgsnd(qid,&qbuffer,MAX_COLA,IPC_NOWAIT); //Camarero le envia a los clientes las cosas hechas ¿Cliente no tiene nada aun para recibir los productos hechos?
+       
+	// qbuffer.mtype=SERVIR;
+	//	msgsnd(qid,&qbuffer,MAX_COLA,IPC_NOWAIT); //Camarero le envia a los clientes las cosas hechas ¿Cliente no tiene nada aun para recibir los productos hechos?
      }
   }
-   
   return 0;
 }
 //Funciones
