@@ -58,30 +58,30 @@ int main() {
       msgsnd(msgqueue_id, &qbuffer, MAX_COLA, 0);
  
       //TODO: Recibir menú y mostrar para selección      
-      printf("=-=-=-=-=-=-=-=-=-=-=\n¿Qué desea pedir?:\n");
-      printf("1. Bebida\n2. Comida\n3. Postre\n0. Nada\n=-=-=-=-=-=-=-=-=-=-=\n");
-      printf("Pulse el número del tipo de producto que desea pedir y un 0 cuando haya terminado la comanda.\n");
       int producto = -1;
       while(producto != 0) {
+         printf("=-=-=-=-=-=-=-MENÚ PRINCIPAL-=-=-=-=-=-=-=\n¿Qué desea pedir?:\n");
+         printf("1. Bebida\n2. Comida\n3. Postre\n0. Nada\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n");
+         printf("Pulse el número del tipo de producto que desea pedir y un 0 cuando haya terminado la comanda.\n");
          printf("Introduzca un número: ");
          scanf("%d", &producto);
          switch(producto) {
             case 1:
-               printf("Producto seleccionado: 1x BEBIDA\n");
+               printf("Carte seleccionada: BEBIDA ");
                qbuffer.mtype=PEDIR;
                strncpy(qbuffer.mtext, "BEBIDA", MAX_COLA);
                msgsnd(msgqueue_id, &qbuffer, MAX_COLA, 0);
-	       carta_pedir ("BEBIDA");
+	       carta_pedir("BEBIDA");
 	       break; 
             case 2:
-               printf("Producto seleccionado: 1x COMIDA\n");
+               printf("Carta seleccionada: COMIDA ");
                qbuffer.mtype=PEDIR;
                strncpy(qbuffer.mtext, "COMIDA", MAX_COLA);
                msgsnd(msgqueue_id, &qbuffer, MAX_COLA, 0);
-	       carta_pedir ("COMIDA");
+	       carta_pedir("COMIDA");
                break;
             case 3:
-               printf("Producto seleccionado: 1x POSTRE\n");
+               printf("Carta seleccionada: POSTRE ");
                qbuffer.mtype=PEDIR;
                strncpy(qbuffer.mtext, "POSTRE", MAX_COLA);
                msgsnd(msgqueue_id, &qbuffer, MAX_COLA, 0);
@@ -130,7 +130,7 @@ void inicializar() {
 void carta_pedir (char *tipo){
     //Recibir lista
     msgrcv(msgqueue_id, &qbuffer, MAX_COLA, SERVIR, 0);
-    printf("%s: %s\n",tipo,qbuffer.mtext);
+    printf("[%s].\n", qbuffer.mtext);
     char *carta_cad = qbuffer.mtext;
     char *carta_lista [8];
     convertToArray(carta_lista, carta_cad, 8); 
