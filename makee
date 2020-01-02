@@ -1,7 +1,0 @@
-gcc  -o crear crear_entorno.c -pthread
-gcc  -o destruir destruir_entorno.c -pthread
-gcc -W -Wall -o cliente cliente.c -pthread
-gcc -W -Wall -o camarero camarero.c -pthread
-gcc -W -Wall -o cocinero cocinero.c -pthread
-./destruir
-./crear
