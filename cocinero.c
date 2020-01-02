@@ -28,7 +28,7 @@ void inicializar();
 void convertToArray(char * arr[], char list[], int size);
 void componer_msg (char pedido_c[10], int pedido, int pid);
 
-int main(int argc, char** argv){
+int main(){
    int i;
    int num_pedido;
    char pedido[5];
