@@ -12,7 +12,6 @@
 #include <sys/shm.h>
 
 #define MAX_COLA 200
-#define SIG_GET 100
 #define PEDIR 1
 #define SERVIR 2
 #define BEBIDAS_PEDIR 3
@@ -69,6 +68,7 @@ void recoger() {
       convertToArray(arr, qbuffer.mtext);
       int num_pedido = atoi(ptr[0]);
       printf("[Mesa %s] Producto: %d, ¡Listo para entregar!\n", ptr[1], num_pedido);
+      printf("[Mesa %s] Producto: %d entregado.\n", ptr[1], num_pedido);
       servir(ptr[1], num_pedido);
    }
 }
@@ -87,11 +87,10 @@ void inicializar() {
    msgsnd(qid,&qbuffer,MAX_COLA,IPC_NOWAIT);
    printf("Iniciando sincronización... (PID: %d)\n", pid);
 }
-void servir(char *pid_cli, int num_pedido){
-  qbuffer.mtype = atoi(pid_cli);
+void servir(char mesa[], int num_pedido){
+  qbuffer.mtype = atoi(mesa);
   char pedido[2];
   sprintf(pedido, "%d", num_pedido);
   strncpy(qbuffer.mtext, pedido, MAX_COLA);
-  msgsnd(qid,&qbuffer,MAX_COLA,0);
-  printf("[Mesa %s] Producto: %d entregado.\n",pid_cli, num_pedido);
+  msgsnd(qid, &qbuffer, MAX_COLA,0);
 }

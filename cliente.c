@@ -95,7 +95,7 @@ int main() {
       while(contador_ped!=0){
 	recibir();
       }
-      printf("Todo entredago, ¡gracias por su visita!\n");
+      printf("Todo entregado, ¡Gracias por su visita!\n");
    } else {
       printf("La entrada introducida es incorrecta.\n");
    }
@@ -153,7 +153,7 @@ void carta_pedir (){
 }
 void recibir(){
   if(msgrcv(msgqueue_id,&qbuffer,MAX_COLA,pid,IPC_NOWAIT)!=-1) {
-      printf("[Mesa %d] Producto: %s recibido.\n", pid, qbuffer.mtext);
+      printf("Producto: %s recibido.\n", qbuffer.mtext);
       contador_ped--;
    }
 }

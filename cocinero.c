@@ -14,7 +14,6 @@
 #define POSTRES_PREPARAR 5
 #define PEDIDOS_SERVIR 6
 #define SINCRO 7
-#define SIG_GET 100
 
 struct mymsgbuf{ 
    long mtype; 
@@ -92,5 +91,5 @@ void inicializar() {
    printf("Esperando sicronismo con servidor...\n");
    msgrcv(qid,&qbuffer,MAX_COLA,SINCRO,0);
    pid = atoi(qbuffer.mtext);
-   printf("Cocina lista. PID: %d\n", pid);
+   printf("Cocina lista. (PID Servidor: %d)\n", pid);
 }
