@@ -31,9 +31,9 @@ int main(){
    int i;
    int num_pedido;
    char pedido[5];
-   char *bebidas[] = {"Nada","Cerveza","Coca-Cola","Zumo","Nestea","Aquarius","Agua","bibaerVino"};
+   char *bebidas[] = {"Nada","Cerveza","Coca-Cola","Zumo","Nestea","Aquarius","Agua"};
    char *comidas[] = {"Nada","Ensaladilla","Papas Bravas","Ensalada","Tortilla","Puntillitas","Calamares","Revuelto de setas"};
-   char *postres[] = {"Nada","Flan de huevo","Arroz con leche","Tarta de la visabuela","Brownie","Tarta de turrazos matematicos","Helado","Fruta del dia"};
+   char *postres[] = {"Nada","Flan de huevo","Arroz con leche","Tarta de la abuela","Brownie","Tarta de turrazos matematicos","Helado","Fruta del dia"};
    inicializar();
    while(1) {
       for(i=BEBIDAS_PREPARAR;i<=POSTRES_PREPARAR;i++){
